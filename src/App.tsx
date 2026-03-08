@@ -102,7 +102,7 @@ export default function App() {
             className="flex items-center gap-3 text-left cursor-pointer transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0f] rounded-lg"
             aria-label="Back to top"
           >
-            <img src="/uw-logo-shield.png" alt="" className="h-10 w-10 shrink-0 object-contain" />
+            <img src={`${import.meta.env.BASE_URL}uw-logo-shield.png`} alt="" className="h-10 w-10 shrink-0 object-contain" />
             <div className="flex flex-col">
               <span className="font-semibold text-lg leading-tight">CS Demo Day</span>
               <span className="text-xs text-gray-400">University of Windsor</span>
@@ -176,7 +176,7 @@ export default function App() {
         {/* Subtle shield watermark — very low opacity, blends with theme */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
           <img
-            src="/uw-logo-shield.png"
+            src={`${import.meta.env.BASE_URL}uw-logo-shield.png`}
             alt=""
             className="max-w-[480px] md:max-w-[560px] w-full h-auto object-contain opacity-[0.06]"
           />
@@ -197,7 +197,7 @@ export default function App() {
                     className="absolute inset-0 flex flex-col items-center justify-center"
                   >
                     <img
-                      src="/uw-logo-full.png"
+                      src={`${import.meta.env.BASE_URL}uw-logo-full.png`}
                       alt="University of Windsor"
                       className="max-w-[340px] md:max-w-[460px] w-full h-auto object-contain mb-8"
                     />
@@ -668,7 +668,7 @@ export default function App() {
           <div className="grid md:grid-cols-3 gap-12 mb-12">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <img src="/uw-logo-shield.png" alt="University of Windsor" className="h-10 w-10 shrink-0 object-contain" />
+                <img src={`${import.meta.env.BASE_URL}uw-logo-shield.png`} alt="University of Windsor" className="h-10 w-10 shrink-0 object-contain" />
                 <div className="flex flex-col">
                   <span className="font-semibold text-lg leading-tight">CS Demo Day</span>
                   <span className="text-xs text-gray-400">University of Windsor</span>
