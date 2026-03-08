@@ -187,3 +187,34 @@
 .cta-glow-pulse {
   animation: cta-glow-pulse 2.5s ease-in-out infinite;
 }
+
+/* Schedule timeline dot: glow + scale pulse (run on group-hover) */
+@keyframes schedule-dot-pulse-blue {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.45);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+}
+
+@keyframes schedule-dot-pulse-purple {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.45);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
+  }
+}
+
+.group:hover .schedule-dot-pulse-blue {
+  animation: schedule-dot-pulse-blue 1.5s ease-in-out infinite;
+}
+
+.group:hover .schedule-dot-pulse-purple {
+  animation: schedule-dot-pulse-purple 1.5s ease-in-out infinite;
+}

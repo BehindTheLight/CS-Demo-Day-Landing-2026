@@ -1,21 +1,60 @@
 import { Calendar, MapPin, Clock, Users, Lightbulb, Trophy, Zap, ChevronDown } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './components/ui/accordion';
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useInView } from 'motion/react';
 
 const SECTION_IDS = ['hero', 'about', 'submit', 'attend', 'schedule', 'faq'] as const;
 
+const scheduleStaggerVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.065, delayChildren: 0.12 } } };
+const scheduleItemVariants = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
+
 const PARTICIPANT_REGISTRATION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSelqknwzF-ht4gNg1FALEAf7pL-A8gUeTTS9CnCIv5bBvr4nQ/viewform';
+
+const EVENT_DATE = new Date('2026-03-27T10:00:00');
+const EVENT_END_DATE = new Date('2026-03-27T17:00:00'); // 5pm
+
+// Set to true to test: event "starts" in 5s, "ends" in 20s. Set back to false when done.
+const TEST_COUNTDOWN = false;
+const EVENT_DATE_TEST = (() => { const d = new Date(); d.setSeconds(d.getSeconds() + 5); return d; })();
+const EVENT_END_DATE_TEST = (() => { const d = new Date(); d.setSeconds(d.getSeconds() + 20); return d; })();
+
+type CountdownState =
+  | { status: 'countdown'; days: number; hours: number; minutes: number; seconds: number }
+  | { status: 'live' }
+  | { status: 'ended' };
+
+function getCountdown(): CountdownState {
+  const now = new Date();
+  const startAt = TEST_COUNTDOWN ? EVENT_DATE_TEST : EVENT_DATE;
+  const endAt = TEST_COUNTDOWN ? EVENT_END_DATE_TEST : EVENT_END_DATE;
+  if (now >= endAt) return { status: 'ended' };
+  if (now >= startAt) return { status: 'live' };
+  const diff = startAt.getTime() - now.getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+  return { status: 'countdown', days, hours, minutes, seconds };
+}
 
 export default function App() {
   const [openFaq, setOpenFaq] = useState<string>('');
   const [heroStage, setHeroStage] = useState<1 | 2>(1);
   const [activeSectionIndex, setActiveSectionIndex] = useState(0);
+  const [countdown, setCountdown] = useState<CountdownState>(getCountdown);
   const scrollContainerRef = useRef<HTMLElement>(null);
+  const scheduleRef = useRef<HTMLDivElement>(null);
+  const scheduleInView = useInView(scheduleRef, { once: true, amount: 0.05 });
 
   useEffect(() => {
     const toDemoDay = setTimeout(() => setHeroStage(2), 3000);
     return () => clearTimeout(toDemoDay);
+  }, []);
+
+  useEffect(() => {
+    setCountdown(getCountdown());
+    const interval = setInterval(() => setCountdown(getCountdown()), 1000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -129,7 +168,15 @@ export default function App() {
         <div className="absolute inset-0 bg-gradient-to-b from-blue-950/20 via-purple-950/20 to-[#0a0a0f]"></div>
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
         <div className="absolute top-20 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
-        
+        {/* Subtle shield watermark — very low opacity, blends with theme */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
+          <img
+            src="/uw-logo-shield.png"
+            alt=""
+            className="max-w-[480px] md:max-w-[560px] w-full h-auto object-contain opacity-[0.06]"
+          />
+        </div>
+
         <div className="max-w-7xl mx-auto relative z-10 w-full">
           <div className="text-center mb-16">
             {/* Animated Title Section */}
@@ -166,9 +213,78 @@ export default function App() {
                     transition={{ duration: 1, ease: "easeOut" }}
                     className="absolute inset-0 flex flex-col items-center justify-center"
                   >
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-purple-500/30 bg-purple-500/10 mb-8">
-                      <Zap className="w-4 h-4 text-purple-400" />
-                      <span className="text-sm text-purple-300">University of Windsor · Computer Science</span>
+                    <div className="inline-flex flex-col items-center gap-1 mb-8 [text-shadow:0_0_20px_rgba(255,255,255,0.3),0_0_40px_rgba(192,132,252,0.25),0_0_60px_rgba(139,92,246,0.15)]">
+                      {countdown.status === 'countdown' && (
+                        <div className="inline-flex items-center gap-3 sm:gap-5">
+                          <div className="flex flex-col items-center">
+                            <span className="text-2xl sm:text-3xl font-bold tabular-nums text-white">{String(countdown.days).padStart(2, '0')}</span>
+                            <span className="text-xs text-purple-300 uppercase tracking-wider">Days</span>
+                          </div>
+                          <span className="text-xl text-purple-400/80 font-medium">:</span>
+                          <div className="flex flex-col items-center">
+                            <span className="text-2xl sm:text-3xl font-bold tabular-nums text-white">{String(countdown.hours).padStart(2, '0')}</span>
+                            <span className="text-xs text-purple-300 uppercase tracking-wider">Hours</span>
+                          </div>
+                          <span className="text-xl text-purple-400/80 font-medium">:</span>
+                          <div className="flex flex-col items-center">
+                            <span className="text-2xl sm:text-3xl font-bold tabular-nums text-white">{String(countdown.minutes).padStart(2, '0')}</span>
+                            <span className="text-xs text-purple-300 uppercase tracking-wider">Min</span>
+                          </div>
+                          <span className="text-xl text-purple-400/80 font-medium">:</span>
+                          <div className="flex flex-col items-center">
+                            <span className="text-2xl sm:text-3xl font-bold tabular-nums text-white">{String(countdown.seconds).padStart(2, '0')}</span>
+                            <span className="text-xs text-purple-300 uppercase tracking-wider">Sec</span>
+                          </div>
+                        </div>
+                      )}
+                      {countdown.status === 'live' && (
+                        <div className="flex flex-col items-center gap-1 text-center">
+                          <motion.span
+                            className="text-xl sm:text-2xl font-semibold text-white [text-shadow:0_0_20px_rgba(255,255,255,0.4),0_0_40px_rgba(192,132,252,0.35),0_0_60px_rgba(139,92,246,0.2)]"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.6 }}
+                          >
+                            Happening Now
+                          </motion.span>
+                          <motion.span
+                            className="text-lg text-purple-300"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.8, duration: 0.6 }}
+                          >
+                            at
+                          </motion.span>
+                          <motion.span
+                            className="text-base text-purple-300/90"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 1.4, duration: 0.6 }}
+                          >
+                            Advanced Computing Hub, 300 Ouellette Ave
+                          </motion.span>
+                        </div>
+                      )}
+                      {countdown.status === 'ended' && (
+                        <div className="flex flex-col items-center gap-1 text-center">
+                          <motion.span
+                            className="text-lg sm:text-xl font-medium text-white"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.6 }}
+                          >
+                            The event has ended.
+                          </motion.span>
+                          <motion.span
+                            className="text-base text-purple-300"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.9, duration: 0.6 }}
+                          >
+                            Thank you for attending.
+                          </motion.span>
+                        </div>
+                      )}
                     </div>
                     
                     <motion.h1
@@ -418,71 +534,44 @@ export default function App() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <span className="text-sm uppercase tracking-wider text-purple-400 font-medium">Day of the Event</span>
-            <h2 className="text-4xl md:text-5xl mt-4 mb-4">Schedule</h2>
+            <h2 className="text-4xl md:text-5xl mt-4 mb-4 [text-shadow:0_0_24px_rgba(192,132,252,0.25),0_0_48px_rgba(139,92,246,0.15)]">Schedule</h2>
             <p className="text-gray-400 text-lg">March 27, 2026 · Advanced Computing Hub, University of Windsor</p>
           </div>
-          
-          <div className="space-y-4">
-            <div className="flex gap-6 items-start group">
-              <div className="flex flex-col items-center">
-                <div className="w-3 h-3 rounded-full bg-blue-500 ring-4 ring-blue-500/20"></div>
-                <div className="w-0.5 h-full bg-gradient-to-b from-blue-500/50 to-transparent mt-2"></div>
-              </div>
-              <div className="flex-1 pb-12">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-400 font-medium">10:00 AM</span>
-                  <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-sm">Setup</span>
-                </div>
-                <h3 className="text-xl mb-2">Welcome & Opening</h3>
-                <p className="text-gray-400">Teams set up their booths and attendees register</p>
-              </div>
-            </div>
 
-            <div className="flex gap-6 items-start group">
-              <div className="flex flex-col items-center">
-                <div className="w-3 h-3 rounded-full bg-purple-500 ring-4 ring-purple-500/20"></div>
-                <div className="w-0.5 h-full bg-gradient-to-b from-purple-500/50 to-transparent mt-2"></div>
-              </div>
-              <div className="flex-1 pb-12">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-400 font-medium">10:15 AM</span>
-                  <span className="px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-sm">Demos</span>
+          <motion.div
+            ref={scheduleRef}
+            className="space-y-5"
+            initial="hidden"
+            animate={scheduleInView ? 'visible' : 'hidden'}
+            variants={scheduleStaggerVariants}
+          >
+            {[
+              { time: '10:00 AM', tag: 'Setup', tagBlue: true, title: 'Doors Open & Check-In', desc: 'Teams set up their booths and attendees register.' },
+              { time: '10:30 AM', tag: 'Keynote', tagBlue: false, title: 'Opening Ceremony', desc: 'Welcome remarks from the Department Chair and keynote speaker from industry.' },
+              { time: '11:00 AM', tag: 'Demos', tagBlue: true, title: 'Demo Sessions — Round 1', desc: 'First batch of project presentations. Judges and attendees circulate the floor.' },
+              { time: '12:30 PM', tag: 'Break', tagBlue: false, title: 'Lunch Break', desc: 'Catered lunch for all participants and attendees. Networking encouraged!' },
+              { time: '1:30 PM', tag: 'Demos', tagBlue: true, title: 'Demo Sessions — Round 2', desc: 'Second batch of projects presented. Industry guests mingle with teams.' },
+              { time: '3:00 PM', tag: 'Judging', tagBlue: false, title: "Judges' Deliberation", desc: 'Judging panel meets to score and select award winners.' },
+              { time: '3:30 PM', tag: 'Open Floor', tagBlue: true, title: 'Poster Session & Open Floor', desc: 'All projects on display simultaneously — open browsing for all attendees.' },
+              { time: '4:30 PM', tag: 'Awards', tagBlue: false, title: 'Awards Ceremony', desc: 'Announcing winners in all categories, recognition of outstanding projects.' },
+              { time: '5:00 PM', tag: 'Closing', tagBlue: true, title: 'Closing & Networking', desc: 'Event concludes. Informal networking with guests and recruiters.', last: true },
+            ].map((item, i) => (
+              <motion.div key={i} className="group flex gap-6 items-start" variants={scheduleItemVariants}>
+                <div className="flex flex-col items-center shrink-0 -mb-5">
+                  <div className={`w-3 h-3 rounded-full ring-4 shrink-0 transition-shadow duration-300 ${item.tagBlue ? 'bg-blue-500 ring-blue-500/20 schedule-dot-pulse-blue' : 'bg-purple-500 ring-purple-500/20 schedule-dot-pulse-purple'}`} />
+                  {!item.last && <div className="w-0.5 flex-1 min-h-[2rem] bg-gradient-to-b from-white/25 to-transparent mt-2" />}
                 </div>
-                <h3 className="text-xl mb-2">Student Demo Showcase Begins</h3>
-                <p className="text-gray-400">First batch of project presentations. Judges and attendees circulate the floor</p>
-              </div>
-            </div>
-
-            <div className="flex gap-6 items-start group">
-              <div className="flex flex-col items-center">
-                <div className="w-3 h-3 rounded-full bg-blue-500 ring-4 ring-blue-500/20"></div>
-                <div className="w-0.5 h-full bg-gradient-to-b from-blue-500/50 to-transparent mt-2"></div>
-              </div>
-              <div className="flex-1 pb-12">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-400 font-medium">11:00 AM</span>
-                  <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-sm">Networking</span>
+                <div className={`flex-1 min-w-0 rounded-xl border border-white/10 bg-white/5 px-5 py-4 transition-all duration-300 hover:bg-white/[0.07] hover:border-white/20 ${item.tagBlue ? 'hover:shadow-[0_0_28px_rgba(59,130,246,0.28)]' : 'hover:shadow-[0_0_28px_rgba(139,92,246,0.28)]'} ${item.last ? 'pb-4' : 'pb-12'}`}>
+                  <div className="flex items-center justify-between gap-4 mb-2">
+                    <span className="text-gray-400 font-medium tabular-nums shrink-0 w-20">{item.time}</span>
+                    <span className={`px-3 py-1 rounded-full text-sm shrink-0 ${item.tagBlue ? 'bg-blue-500/10 text-blue-400' : 'bg-purple-500/10 text-purple-400'}`}>{item.tag}</span>
+                  </div>
+                  <h3 className="text-xl mb-2">{item.title}</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
                 </div>
-                <h3 className="text-xl mb-2">Poster Presentations & Networking</h3>
-                <p className="text-gray-400">Interactive poster sessions with industry guests and faculty</p>
-              </div>
-            </div>
-
-            <div className="flex gap-6 items-start group">
-              <div className="flex flex-col items-center">
-                <div className="w-3 h-3 rounded-full bg-purple-500 ring-4 ring-purple-500/20"></div>
-                <div className="w-0.5 h-full bg-gradient-to-b from-purple-500/50 to-transparent mt-2"></div>
-              </div>
-              <div className="flex-1 pb-12">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-400 font-medium">12:30 PM</span>
-                  <span className="px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-sm">Closing</span>
-                </div>
-                <h3 className="text-xl mb-2">Closing & Final Networking</h3>
-                <p className="text-gray-400">Event concludes. Informal networking with guests and recruiters</p>
-              </div>
-            </div>
-          </div>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
@@ -497,66 +586,77 @@ export default function App() {
           <Accordion type="single" collapsible value={openFaq} onValueChange={setOpenFaq}>
             <AccordionItem value="item-1" className="border-white/10 mb-4">
               <AccordionTrigger className="text-lg hover:no-underline py-6 px-6 rounded-xl bg-white/5 hover:bg-white/10 transition-all data-[state=open]:bg-white/10 data-[state=open]:rounded-b-none">
-                Who can attend?
+                Who can submit a project?
               </AccordionTrigger>
               <AccordionContent className="px-6 py-6 bg-white/5 rounded-b-xl border-t border-white/10">
                 <p className="text-gray-300 leading-relaxed">
-                  CS Demo Day is open to everyone! Students, faculty, industry professionals, alumni, and members of the broader community are all welcome to attend. No registration is required for attendees.
+                  Any currently enrolled undergraduate or graduate student in the Computer Science department. Teams of up to 4 members are welcome.
                 </p>
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-2" className="border-white/10 mb-4">
               <AccordionTrigger className="text-lg hover:no-underline py-6 px-6 rounded-xl bg-white/5 hover:bg-white/10 transition-all data-[state=open]:bg-white/10 data-[state=open]:rounded-b-none">
-                Who can submit a project?
+                Does my project have to be from a class?
               </AccordionTrigger>
               <AccordionContent className="px-6 py-6 bg-white/5 rounded-b-xl border-t border-white/10">
                 <p className="text-gray-300 leading-relaxed">
-                  Any current Computer Science student at the University of Windsor (undergraduate or graduate) can submit a project. Teams of 1-4 members are eligible. Projects must be original work completed during the current academic year.
+                  No! Projects can be personal, research-based, or from a course. The key requirement is that the work is original and completed during the current academic year.
                 </p>
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-3" className="border-white/10 mb-4">
               <AccordionTrigger className="text-lg hover:no-underline py-6 px-6 rounded-xl bg-white/5 hover:bg-white/10 transition-all data-[state=open]:bg-white/10 data-[state=open]:rounded-b-none">
-                What kinds of projects are accepted?
+                What should I bring on Demo Day?
               </AccordionTrigger>
               <AccordionContent className="px-6 py-6 bg-white/5 rounded-b-xl border-t border-white/10">
                 <p className="text-gray-300 leading-relaxed">
-                  We accept a wide range of projects including personal projects, course-based work, advanced research, and thesis projects. Categories include AI & Machine Learning, Web & Mobile Development, Systems & Networking, Human-Computer Interaction, Cybersecurity, Data Science & Visualization, Embedded & IoT Systems, and more. A working demo or prototype is required.
+                  Bring your laptop, any hardware needed for your demo, and a printed poster (optional but encouraged). Power outlets will be available at each booth.
                 </p>
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-4" className="border-white/10 mb-4">
               <AccordionTrigger className="text-lg hover:no-underline py-6 px-6 rounded-xl bg-white/5 hover:bg-white/10 transition-all data-[state=open]:bg-white/10 data-[state=open]:rounded-b-none">
-                Is registration required?
+                Is there a registration fee?
               </AccordionTrigger>
               <AccordionContent className="px-6 py-6 bg-white/5 rounded-b-xl border-t border-white/10">
                 <p className="text-gray-300 leading-relaxed">
-                  Registration is not required for general attendees. However, if you wish to present a project, you must submit your project through the submission form by the deadline (April 30, 2026).
+                  No. Participation is completely free for all students. Attending as a guest is also free and open to the public.
                 </p>
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-5" className="border-white/10 mb-4">
               <AccordionTrigger className="text-lg hover:no-underline py-6 px-6 rounded-xl bg-white/5 hover:bg-white/10 transition-all data-[state=open]:bg-white/10 data-[state=open]:rounded-b-none">
-                Where is the venue?
+                How will projects be judged?
               </AccordionTrigger>
               <AccordionContent className="px-6 py-6 bg-white/5 rounded-b-xl border-t border-white/10">
                 <p className="text-gray-300 leading-relaxed">
-                  The event will be held at the Advanced Computing Hub, University of Windsor. Detailed directions and parking information will be shared closer to the event date.
+                  A panel of faculty and industry judges evaluates projects on innovation, technical complexity, presentation quality, and real-world impact.
                 </p>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-6" className="border-white/10">
+            <AccordionItem value="item-6" className="border-white/10 mb-4">
               <AccordionTrigger className="text-lg hover:no-underline py-6 px-6 rounded-xl bg-white/5 hover:bg-white/10 transition-all data-[state=open]:bg-white/10 data-[state=open]:rounded-b-none">
-                Can I attend even if I'm not presenting?
+                Can I attend even if I&apos;m not presenting?
               </AccordionTrigger>
               <AccordionContent className="px-6 py-6 bg-white/5 rounded-b-xl border-t border-white/10">
                 <p className="text-gray-300 leading-relaxed">
-                  Absolutely! We encourage all students, faculty, and community members to attend and support our presenters. It's a great opportunity to see innovative projects, network with peers and industry professionals, and get inspired.
+                  Absolutely! We encourage all students, faculty, and guests to attend and explore the projects on display.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-7" className="border-white/10">
+              <AccordionTrigger className="text-lg hover:no-underline py-6 px-6 rounded-xl bg-white/5 hover:bg-white/10 transition-all data-[state=open]:bg-white/10 data-[state=open]:rounded-b-none">
+                What prizes are available?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 py-6 bg-white/5 rounded-b-xl border-t border-white/10">
+                <p className="text-gray-300 leading-relaxed">
+                  Awards include Best Overall Project, Best Technical Achievement, Best Design & UX, Best Social Impact, and People&apos;s Choice. Prize details to be announced.
                 </p>
               </AccordionContent>
             </AccordionItem>
