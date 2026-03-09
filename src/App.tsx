@@ -9,6 +9,7 @@ const scheduleStaggerVariants = { hidden: {}, visible: { transition: { staggerCh
 const scheduleItemVariants = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
 const PARTICIPANT_REGISTRATION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSelqknwzF-ht4gNg1FALEAf7pL-A8gUeTTS9CnCIv5bBvr4nQ/viewform';
+const PROJECT_SUBMISSION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSevBxky8AILviHbGyK3XLmtiOqw8ddW8tQ0AIy7ZLS1MInYBg/viewform';
 
 const EVENT_DATE = new Date('2026-03-27T10:00:00');
 const EVENT_END_DATE = new Date('2026-03-27T17:00:00'); // 5pm
@@ -316,7 +317,7 @@ export default function App() {
                       className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
                     >
                       <a 
-                        href="https://docs.google.com/forms/d/e/1FAIpQLSevBxky8AILviHbGyK3XLmtiOqw8ddW8tQ0AIy7ZLS1MInYBg/viewform" 
+                        href={PROJECT_SUBMISSION_URL} 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="cta-glow-pulse px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all duration-300 text-lg font-medium hover:shadow-[0_0_24px_rgba(139,92,246,0.5)] hover:scale-[1.02]"
@@ -467,7 +468,7 @@ export default function App() {
               </div>
               
               <a 
-                href="https://docs.google.com/forms/d/e/1FAIpQLSevBxky8AILviHbGyK3XLmtiOqw8ddW8tQ0AIy7ZLS1MInYBg/viewform" 
+                href={PROJECT_SUBMISSION_URL} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="cta-glow-pulse inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all duration-300 text-lg font-medium hover:shadow-[0_0_24px_rgba(139,92,246,0.5)] hover:scale-[1.02]"
