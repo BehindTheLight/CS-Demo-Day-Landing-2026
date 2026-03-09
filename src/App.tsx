@@ -1,4 +1,4 @@
-import { Calendar, MapPin, Clock, Users, Lightbulb, Trophy, Zap, ChevronDown, Menu, X } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, Lightbulb, Trophy, CalendarCheck, ChevronDown, Menu, X } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './components/ui/accordion';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'motion/react';
@@ -49,7 +49,7 @@ export default function App() {
   const scheduleInView = useInView(scheduleRef, { once: true, amount: 0.05 });
 
   useEffect(() => {
-    const toDemoDay = setTimeout(() => setHeroStage(2), 1700);
+    const toDemoDay = setTimeout(() => setHeroStage(2), 1300);
     return () => clearTimeout(toDemoDay);
   }, []);
 
@@ -221,10 +221,10 @@ export default function App() {
 
       <main
         ref={scrollContainerRef}
-        className="h-screen overflow-y-auto md:snap-y md:snap-mandatory md:scroll-smooth"
+        className="h-screen overflow-y-auto overflow-x-hidden md:snap-y md:snap-mandatory md:scroll-smooth"
       >
       {/* Hero Section */}
-      <section id="hero" className="relative pt-24 pb-14 px-4 sm:px-6 md:pt-32 md:pb-20 md:px-6 min-h-screen flex items-start md:items-center overflow-y-auto md:overflow-hidden md:snap-start md:snap-always">
+      <section id="hero" className="relative pt-24 pb-14 px-4 sm:px-6 md:pt-32 md:pb-20 md:px-6 min-h-screen flex items-start md:items-center overflow-y-auto overflow-x-hidden md:overflow-hidden md:snap-start md:snap-always">
         {/* Background Effects */}
         <div className="absolute inset-0 bg-gradient-to-b from-blue-950/20 via-purple-950/20 to-[#0a0a0f]"></div>
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
@@ -375,7 +375,7 @@ export default function App() {
                         href={PROJECT_SUBMISSION_URL} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="cta-glow-pulse px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all duration-300 text-lg font-medium hover:shadow-[0_0_24px_rgba(139,92,246,0.5)] hover:scale-[1.02]"
+                        className="cta-glow-pulse px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all duration-300 text-lg font-medium hover:shadow-[0_0_32px_rgba(139,92,246,0.55),0_0_48px_rgba(59,130,246,0.25)] hover:scale-[1.02]"
                       >
                         Submit Your Project
                       </a>
@@ -397,8 +397,8 @@ export default function App() {
                         <Calendar className="w-5 h-5 text-purple-400" />
                         <span>March 27, 2026</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-5 h-5 text-blue-400" />
+                      <div className="flex items-start gap-2">
+                        <MapPin className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
                         <span>Advanced Computing Hub, University of Windsor</span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -456,7 +456,7 @@ export default function App() {
                     <div className="text-gray-400 text-sm md:text-base">Awards</div>
                   </div>
                   <div className="p-4 md:p-5 rounded-2xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-500/20 transition-all duration-300 hover:border-blue-500/40 hover:shadow-[0_0_24px_rgba(59,130,246,0.28)]">
-                    <Zap className="w-8 h-8 md:w-9 md:h-9 text-blue-400 mb-2 md:mb-3" />
+                    <CalendarCheck className="w-8 h-8 md:w-9 md:h-9 text-blue-400 mb-2 md:mb-3" />
                     <div className="text-2xl md:text-3xl font-bold mb-1">5th</div>
                     <div className="text-gray-400 text-sm md:text-base">Annual Event</div>
                   </div>
@@ -534,7 +534,7 @@ export default function App() {
                 href={PROJECT_SUBMISSION_URL} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="cta-glow-pulse inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all duration-300 text-lg font-medium hover:shadow-[0_0_24px_rgba(139,92,246,0.5)] hover:scale-[1.02]"
+                className="cta-glow-pulse inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all duration-300 text-lg font-medium hover:shadow-[0_0_32px_rgba(139,92,246,0.55),0_0_48px_rgba(59,130,246,0.25)] hover:scale-[1.02]"
               >
                 Submit Application
                 <ChevronDown className="w-5 h-5 rotate-[-90deg]" />
@@ -581,7 +581,7 @@ export default function App() {
                 href={PARTICIPANT_REGISTRATION_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="cta-glow-pulse inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all duration-300 text-lg font-medium hover:shadow-[0_0_24px_rgba(139,92,246,0.5)] hover:scale-[1.02]"
+                className="cta-glow-pulse inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all duration-300 text-lg font-medium hover:shadow-[0_0_32px_rgba(139,92,246,0.55),0_0_48px_rgba(59,130,246,0.25)] hover:scale-[1.02]"
               >
                 Register To Attend
                 <ChevronDown className="w-5 h-5 rotate-[-90deg]" />

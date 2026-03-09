@@ -2,8 +2,9 @@
 
 :root {
   --font-size: 16px;
-  --background: #ffffff;
-  --foreground: oklch(0.145 0 0);
+  /* Use a dark default background so mobile browser UI and safe-area edges don't show white */
+  --background: #020617;
+  --foreground: oklch(0.985 0 0);
   --card: #ffffff;
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -129,6 +130,9 @@
     margin: 0;
     min-width: 320px;
     font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    /* Account for iOS safe area and avoid white strip at the bottom */
+    padding-bottom: env(safe-area-inset-bottom);
+    background-color: #020617;
   }
 
   html {
@@ -174,13 +178,13 @@
   }
 }
 
-/* Gentle glow pulse for CTA button — glow intensity breathes */
+/* Gentle glow pulse for CTA button — glow intensity breathes (stronger for visibility) */
 @keyframes cta-glow-pulse {
   0%, 100% {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(139, 92, 246, 0.22);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 0 28px rgba(139, 92, 246, 0.4), 0 0 48px rgba(59, 130, 246, 0.2);
   }
   50% {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 0 32px rgba(139, 92, 246, 0.42);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(139, 92, 246, 0.55), 0 0 64px rgba(59, 130, 246, 0.28);
   }
 }
 
@@ -235,15 +239,15 @@
   animation: faq-glow-pulse 2.5s ease-in-out infinite;
 }
 
-/* Submit & Attend sections: soft breathing glow between blue and purple */
+/* Submit & Attend sections: soft breathing glow between blue and purple (stronger for visibility) */
 @keyframes section-cta-glow {
   0%, 100% {
-    border-color: rgba(59, 130, 246, 0.28);
-    box-shadow: 0 0 24px rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.45);
+    box-shadow: 0 0 32px rgba(59, 130, 246, 0.18), 0 0 48px rgba(139, 92, 246, 0.1);
   }
   50% {
-    border-color: rgba(139, 92, 246, 0.32);
-    box-shadow: 0 0 28px rgba(139, 92, 246, 0.12);
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 40px rgba(139, 92, 246, 0.22), 0 0 56px rgba(59, 130, 246, 0.12);
   }
 }
 
