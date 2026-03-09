@@ -48,7 +48,7 @@ export default function App() {
   const scheduleInView = useInView(scheduleRef, { once: true, amount: 0.05 });
 
   useEffect(() => {
-    const toDemoDay = setTimeout(() => setHeroStage(2), 3000);
+    const toDemoDay = setTimeout(() => setHeroStage(2), 2000);
     return () => clearTimeout(toDemoDay);
   }, []);
 
