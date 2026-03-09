@@ -1,4 +1,4 @@
-import { Calendar, MapPin, Clock, Users, Lightbulb, Trophy, Zap, ChevronDown } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, Lightbulb, Trophy, Zap, ChevronDown, Menu, X } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './components/ui/accordion';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'motion/react';
@@ -40,6 +40,7 @@ function getCountdown(): CountdownState {
 
 export default function App() {
   const [openFaq, setOpenFaq] = useState<string>('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [heroStage, setHeroStage] = useState<1 | 2>(1);
   const [activeSectionIndex, setActiveSectionIndex] = useState(0);
   const [countdown, setCountdown] = useState<CountdownState>(getCountdown);
@@ -81,6 +82,7 @@ export default function App() {
   }, []);
 
   const scrollToSection = (id: string) => {
+    setMobileMenuOpen(false);
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -96,7 +98,7 @@ export default function App() {
     <div className="min-h-screen bg-[#0a0a0f] text-white">
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 bg-[#0a0a0f]/80 backdrop-blur-xl border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 md:py-4 flex items-center justify-between">
           <button
             type="button"
             onClick={() => scrollToSection('hero')}
@@ -161,15 +163,68 @@ export default function App() {
               FAQ
             </button>
           </div>
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((o) => !o)}
+            className="md:hidden p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
       </nav>
+
+      {/* Mobile menu overlay */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+              aria-hidden="true"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, x: '100%' }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: '100%' }}
+              transition={{ type: 'tween', duration: 0.25 }}
+              className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-[280px] bg-[#0a0a0f]/98 border-l border-white/10 py-20 px-6 flex flex-col gap-2 md:hidden"
+            >
+              {[
+                { id: 'about', label: 'About' },
+                { id: 'submit', label: 'Apply' },
+                { id: 'attend', label: 'Attend' },
+                { id: 'schedule', label: 'Schedule' },
+                { id: 'faq', label: 'FAQ' },
+              ].map(({ id, label }) => (
+                <button
+                  key={id}
+                  onClick={() => scrollToSection(id)}
+                  className={`text-left py-3 px-4 rounded-xl text-lg font-medium transition-all min-h-[48px] ${
+                    activeSectionIndex === SECTION_IDS.indexOf(id as (typeof SECTION_IDS)[number])
+                      ? 'text-white bg-white/10'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       <main
         ref={scrollContainerRef}
         className="h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth"
       >
       {/* Hero Section */}
-      <section id="hero" className="relative pt-32 pb-20 px-6 overflow-hidden min-h-screen flex items-center snap-start snap-always">
+      <section id="hero" className="relative pt-24 pb-14 px-4 sm:px-6 md:pt-32 md:pb-20 md:px-6 overflow-hidden min-h-screen flex items-center snap-start snap-always">
         {/* Background Effects */}
         <div className="absolute inset-0 bg-gradient-to-b from-blue-950/20 via-purple-950/20 to-[#0a0a0f]"></div>
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
@@ -186,7 +241,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto relative z-10 w-full">
           <div className="text-center mb-16">
             {/* Animated Title Section */}
-            <div className="relative h-[400px] md:h-[500px] flex items-center justify-center">
+            <div className="relative h-[360px] sm:h-[400px] md:h-[500px] flex items-center justify-center">
               <AnimatePresence mode="wait">
                 {heroStage === 1 && (
                   <motion.div
@@ -294,7 +349,7 @@ export default function App() {
                     </div>
                     
                     <h1
-                      className="text-6xl md:text-8xl mb-6"
+                      className="text-5xl sm:text-6xl md:text-8xl mb-4 md:mb-6"
                       style={{ textShadow: '0 0 40px rgba(139, 92, 246, 0.5), 0 0 70px rgba(59, 130, 246, 0.4)' }}
                     >
                       <span className="block">Demo <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Day</span></span>
@@ -305,7 +360,7 @@ export default function App() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.5, duration: 0.8 }}
-                      className="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto mb-12 leading-relaxed"
+                      className="text-base sm:text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto mb-8 md:mb-12 leading-relaxed"
                     >
                       A celebration of innovation, creativity, and engineering excellence — where students showcase the projects that define the future of technology.
                     </motion.p>
@@ -314,7 +369,7 @@ export default function App() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.8, duration: 0.8 }}
-                      className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
+                      className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 md:mb-16"
                     >
                       <a 
                         href={PROJECT_SUBMISSION_URL} 
@@ -429,13 +484,13 @@ export default function App() {
       </section>
 
       {/* Call for Submissions */}
-      <section id="submit" className="py-20 px-6 relative min-h-screen snap-start flex flex-col justify-center">
-        <div className="max-w-4xl mx-auto">
-          <div className="section-cta-glow p-10 rounded-3xl bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-500/10 border relative overflow-hidden">
+      <section id="submit" className="py-12 px-4 sm:px-6 md:py-20 md:px-6 relative min-h-screen snap-start flex flex-col justify-center">
+        <div className="max-w-4xl mx-auto w-full">
+          <div className="section-cta-glow p-6 sm:p-8 md:p-10 rounded-2xl md:rounded-3xl bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-500/10 border relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5"></div>
             <div className="relative z-10">
               <span className="text-sm uppercase tracking-wider text-purple-400 font-medium">Call for Demos</span>
-              <h2 className="text-4xl md:text-5xl mt-4 mb-6">Submit Your <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Project</span></h2>
+              <h2 className="text-3xl md:text-5xl mt-3 md:mt-4 mb-4 md:mb-6">Submit Your <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Project</span></h2>
               <p className="text-xl text-gray-300 mb-8 leading-relaxed">
                 Applications are open! Fill out the form below to register your project. Deadline: <span className="text-white font-medium">April 30, 2026</span>
               </p>
@@ -482,13 +537,13 @@ export default function App() {
       </section>
 
       {/* Attend Section — Register as participant (industry, faculty, guests) */}
-      <section id="attend" className="py-20 px-6 relative min-h-screen snap-start flex flex-col justify-center">
-        <div className="max-w-4xl mx-auto">
-          <div className="section-cta-glow p-10 rounded-3xl bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-500/10 border relative overflow-hidden">
+      <section id="attend" className="py-12 px-4 sm:px-6 md:py-20 md:px-6 relative min-h-screen snap-start flex flex-col justify-center">
+        <div className="max-w-4xl mx-auto w-full">
+          <div className="section-cta-glow p-6 sm:p-8 md:p-10 rounded-2xl md:rounded-3xl bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-500/10 border relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5"></div>
             <div className="relative z-10 text-left">
               <span className="text-sm uppercase tracking-wider text-purple-400 font-medium">Join as an attendee</span>
-              <h2 className="text-4xl md:text-5xl mt-4 mb-6">
+              <h2 className="text-3xl md:text-5xl mt-3 md:mt-4 mb-4 md:mb-6">
                 Register to <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Attend</span>
               </h2>
               <p className="text-xl text-gray-300 mb-8 leading-relaxed">
@@ -529,11 +584,11 @@ export default function App() {
       </section>
 
       {/* Schedule Section */}
-      <section id="schedule" className="py-20 px-6 relative min-h-screen snap-start flex flex-col justify-center">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
+      <section id="schedule" className="py-12 px-4 sm:px-6 md:py-20 md:px-6 relative min-h-screen snap-start flex flex-col justify-center">
+        <div className="max-w-5xl mx-auto w-full">
+          <div className="text-center mb-10 md:mb-16">
             <span className="text-sm uppercase tracking-wider text-purple-400 font-medium">Day of the Event</span>
-            <h2 className="text-4xl md:text-5xl mt-4 mb-4 [text-shadow:0_0_24px_rgba(192,132,252,0.25),0_0_48px_rgba(139,92,246,0.15)]">Schedule</h2>
+            <h2 className="text-3xl md:text-5xl mt-3 md:mt-4 mb-4 [text-shadow:0_0_24px_rgba(192,132,252,0.25),0_0_48px_rgba(139,92,246,0.15)]">Schedule</h2>
             <p className="text-gray-400 text-lg">March 27, 2026 · Advanced Computing Hub, University of Windsor</p>
           </div>
 
@@ -555,18 +610,18 @@ export default function App() {
               { time: '4:30 PM', tag: 'Awards', tagBlue: false, title: 'Awards Ceremony', desc: 'Announcing winners in all categories, recognition of outstanding projects.' },
               { time: '5:00 PM', tag: 'Closing', tagBlue: true, title: 'Closing & Networking', desc: 'Event concludes. Informal networking with guests and recruiters.', last: true },
             ].map((item, i) => (
-              <motion.div key={i} className="group flex gap-6 items-start" variants={scheduleItemVariants}>
+              <motion.div key={i} className="group flex gap-4 md:gap-6 items-start" variants={scheduleItemVariants}>
                 <div className="flex flex-col items-center shrink-0 -mb-5">
                   <div className={`w-3 h-3 rounded-full ring-4 shrink-0 transition-shadow duration-300 ${item.tagBlue ? 'bg-blue-500 ring-blue-500/20 schedule-dot-pulse-blue' : 'bg-purple-500 ring-purple-500/20 schedule-dot-pulse-purple'}`} />
                   {!item.last && <div className="w-0.5 flex-1 min-h-[2rem] bg-gradient-to-b from-white/25 to-transparent mt-2" />}
                 </div>
-                <div className={`flex-1 min-w-0 rounded-xl border border-white/10 bg-white/5 px-5 py-4 transition-all duration-300 hover:bg-white/[0.07] hover:border-white/20 ${item.tagBlue ? 'hover:shadow-[0_0_28px_rgba(59,130,246,0.28)]' : 'hover:shadow-[0_0_28px_rgba(139,92,246,0.28)]'} ${item.last ? 'pb-4' : 'pb-12'}`}>
-                  <div className="flex items-center justify-between gap-4 mb-2">
-                    <span className="text-gray-400 font-medium tabular-nums shrink-0 w-20">{item.time}</span>
-                    <span className={`px-3 py-1 rounded-full text-sm shrink-0 ${item.tagBlue ? 'bg-blue-500/10 text-blue-400' : 'bg-purple-500/10 text-purple-400'}`}>{item.tag}</span>
+                <div className={`flex-1 min-w-0 rounded-xl border border-white/10 bg-white/5 px-4 py-3 md:px-5 md:py-4 transition-all duration-300 hover:bg-white/[0.07] hover:border-white/20 ${item.tagBlue ? 'hover:shadow-[0_0_28px_rgba(59,130,246,0.28)]' : 'hover:shadow-[0_0_28px_rgba(139,92,246,0.28)]'} ${item.last ? 'pb-3 md:pb-4' : 'pb-8 md:pb-12'}`}>
+                  <div className="flex items-center justify-between gap-2 md:gap-4 mb-1 md:mb-2">
+                    <span className="text-gray-400 font-medium tabular-nums shrink-0 w-14 md:w-20 text-sm md:text-base">{item.time}</span>
+                    <span className={`px-2.5 py-0.5 md:px-3 md:py-1 rounded-full text-xs md:text-sm shrink-0 ${item.tagBlue ? 'bg-blue-500/10 text-blue-400' : 'bg-purple-500/10 text-purple-400'}`}>{item.tag}</span>
                   </div>
-                  <h3 className="text-xl mb-2">{item.title}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
+                  <h3 className="text-lg md:text-xl mb-1 md:mb-2">{item.title}</h3>
+                  <p className="text-gray-400 text-xs md:text-sm leading-relaxed">{item.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -575,19 +630,19 @@ export default function App() {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="py-20 px-6 relative min-h-screen snap-start flex flex-col justify-center">
+      <section id="faq" className="py-12 px-4 sm:px-6 md:py-20 md:px-6 relative min-h-screen snap-start flex flex-col justify-center">
         <div className="max-w-3xl mx-auto w-full">
-          <div className="text-center mb-16">
+          <div className="text-center mb-10 md:mb-16">
             <span className="text-sm uppercase tracking-wider text-purple-400 font-medium">FAQ</span>
-            <h2 className="text-4xl md:text-5xl mt-4">Common Questions</h2>
+            <h2 className="text-3xl md:text-5xl mt-3 md:mt-4">Common Questions</h2>
           </div>
 
           <Accordion type="single" collapsible value={openFaq} onValueChange={setOpenFaq} className="w-full space-y-4">
             <AccordionItem value="item-1" className="faq-item-glow w-full border-b-0 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:border-white/20 hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] data-[state=open]:border-purple-500/30">
-              <AccordionTrigger className="w-full text-lg hover:no-underline py-6 px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
+              <AccordionTrigger className="w-full text-base md:text-lg hover:no-underline py-5 px-4 md:py-6 md:px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
                 Who can submit a project?
               </AccordionTrigger>
-              <AccordionContent className="w-full px-6 py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
+              <AccordionContent className="w-full px-4 py-4 md:px-6 md:py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
                 <p className="text-gray-300 leading-relaxed">
                   Any currently enrolled undergraduate or graduate student in the Computer Science department. Teams of up to 4 members are welcome.
                 </p>
@@ -595,10 +650,10 @@ export default function App() {
             </AccordionItem>
 
             <AccordionItem value="item-2" className="faq-item-glow w-full border-b-0 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:border-white/20 hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] data-[state=open]:border-purple-500/30">
-              <AccordionTrigger className="w-full text-lg hover:no-underline py-6 px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
+              <AccordionTrigger className="w-full text-base md:text-lg hover:no-underline py-5 px-4 md:py-6 md:px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
                 Does my project have to be from a class?
               </AccordionTrigger>
-              <AccordionContent className="w-full px-6 py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
+              <AccordionContent className="w-full px-4 py-4 md:px-6 md:py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
                 <p className="text-gray-300 leading-relaxed">
                   No! Projects can be personal, research-based, or from a course. The key requirement is that the work is original and completed during the current academic year.
                 </p>
@@ -606,10 +661,10 @@ export default function App() {
             </AccordionItem>
 
             <AccordionItem value="item-3" className="faq-item-glow w-full border-b-0 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:border-white/20 hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] data-[state=open]:border-purple-500/30">
-              <AccordionTrigger className="w-full text-lg hover:no-underline py-6 px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
+              <AccordionTrigger className="w-full text-base md:text-lg hover:no-underline py-5 px-4 md:py-6 md:px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
                 What should I bring on Demo Day?
               </AccordionTrigger>
-              <AccordionContent className="w-full px-6 py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
+              <AccordionContent className="w-full px-4 py-4 md:px-6 md:py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
                 <p className="text-gray-300 leading-relaxed">
                   Bring your laptop, any hardware needed for your demo, and a printed poster (optional but encouraged). Power outlets will be available at each booth.
                 </p>
@@ -617,10 +672,10 @@ export default function App() {
             </AccordionItem>
 
             <AccordionItem value="item-4" className="faq-item-glow w-full border-b-0 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:border-white/20 hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] data-[state=open]:border-purple-500/30">
-              <AccordionTrigger className="w-full text-lg hover:no-underline py-6 px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
+              <AccordionTrigger className="w-full text-base md:text-lg hover:no-underline py-5 px-4 md:py-6 md:px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
                 Is there a registration fee?
               </AccordionTrigger>
-              <AccordionContent className="w-full px-6 py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
+              <AccordionContent className="w-full px-4 py-4 md:px-6 md:py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
                 <p className="text-gray-300 leading-relaxed">
                   No. Participation is completely free for all students. Attending as a guest is also free and open to the public.
                 </p>
@@ -628,10 +683,10 @@ export default function App() {
             </AccordionItem>
 
             <AccordionItem value="item-5" className="faq-item-glow w-full border-b-0 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:border-white/20 hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] data-[state=open]:border-purple-500/30">
-              <AccordionTrigger className="w-full text-lg hover:no-underline py-6 px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
+              <AccordionTrigger className="w-full text-base md:text-lg hover:no-underline py-5 px-4 md:py-6 md:px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
                 How will projects be judged?
               </AccordionTrigger>
-              <AccordionContent className="w-full px-6 py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
+              <AccordionContent className="w-full px-4 py-4 md:px-6 md:py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
                 <p className="text-gray-300 leading-relaxed">
                   A panel of faculty and industry judges evaluates projects on innovation, technical complexity, presentation quality, and real-world impact.
                 </p>
@@ -639,10 +694,10 @@ export default function App() {
             </AccordionItem>
 
             <AccordionItem value="item-6" className="faq-item-glow w-full border-b-0 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:border-white/20 hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] data-[state=open]:border-purple-500/30">
-              <AccordionTrigger className="w-full text-lg hover:no-underline py-6 px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
+              <AccordionTrigger className="w-full text-base md:text-lg hover:no-underline py-5 px-4 md:py-6 md:px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
                 Can I attend even if I&apos;m not presenting?
               </AccordionTrigger>
-              <AccordionContent className="w-full px-6 py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
+              <AccordionContent className="w-full px-4 py-4 md:px-6 md:py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
                 <p className="text-gray-300 leading-relaxed">
                   Absolutely! We encourage all students, faculty, and guests to attend and explore the projects on display.
                 </p>
@@ -650,10 +705,10 @@ export default function App() {
             </AccordionItem>
 
             <AccordionItem value="item-7" className="faq-item-glow w-full border-b-0 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:border-white/20 hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] data-[state=open]:border-purple-500/30">
-              <AccordionTrigger className="w-full text-lg hover:no-underline py-6 px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
+              <AccordionTrigger className="w-full text-base md:text-lg hover:no-underline py-5 px-4 md:py-6 md:px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
                 What prizes are available?
               </AccordionTrigger>
-              <AccordionContent className="w-full px-6 py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
+              <AccordionContent className="w-full px-4 py-4 md:px-6 md:py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
                 <p className="text-gray-300 leading-relaxed">
                   Awards include Best Overall Project, Best Technical Achievement, Best Design & UX, Best Social Impact, and People&apos;s Choice. Prize details to be announced.
                 </p>
@@ -664,9 +719,9 @@ export default function App() {
       </section>
 
       {/* Footer */}
-      <footer id="footer" className="border-t border-white/10 py-12 px-6 snap-start">
+      <footer id="footer" className="border-t border-white/10 py-8 px-4 sm:px-6 md:py-12 md:px-6 snap-start">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-12 mb-12">
+          <div className="grid md:grid-cols-3 gap-8 md:gap-12 mb-8 md:mb-12">
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <img src={`${import.meta.env.BASE_URL}uw-logo-shield.png`} alt="University of Windsor" className="h-10 w-10 shrink-0 object-contain" />
@@ -732,9 +787,9 @@ export default function App() {
       </footer>
       </main>
 
-      {/* Section progress indicator */}
+      {/* Section progress indicator — hidden on small screens to avoid clutter */}
       <div
-        className="fixed right-6 top-1/2 z-50 -translate-y-1/2 flex flex-col gap-3"
+        className="fixed right-4 md:right-6 top-1/2 z-30 -translate-y-1/2 hidden sm:flex flex-col gap-3"
         aria-label="Page sections"
       >
         {SECTION_IDS.map((id, i) => (
@@ -764,7 +819,7 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             onClick={scrollToNextSection}
-            className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 flex items-center justify-center w-11 h-11 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/30 transition-all duration-300 hover:scale-110 hover:shadow-[0_0_20px_rgba(139,92,246,0.25)]"
+            className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 flex items-center justify-center w-12 h-12 md:w-11 md:h-11 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/30 transition-all duration-300 hover:scale-110 hover:shadow-[0_0_20px_rgba(139,92,246,0.25)] touch-manipulation"
             aria-label="Scroll to next section"
           >
             <ChevronDown className="w-5 h-5 text-white/80" />
