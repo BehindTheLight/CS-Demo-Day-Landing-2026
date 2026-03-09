@@ -274,7 +274,7 @@ export default function App() {
                     transition={{ duration: 1, ease: "easeOut" }}
                     className="relative md:absolute md:inset-0 flex flex-col items-center justify-center w-full"
                   >
-                    <div className="inline-flex flex-col items-center gap-1 mb-6 md:mb-8 [text-shadow:0_0_20px_rgba(255,255,255,0.3),0_0_40px_rgba(192,132,252,0.25),0_0_60px_rgba(139,92,246,0.15)]">
+                    <div className="inline-flex flex-col items-center gap-1 mb-6 md:mb-8 countdown-glow">
                       {countdown.status === 'countdown' && (
                         <div className="inline-flex items-center gap-3 sm:gap-5">
                           <div className="flex flex-col items-center">
@@ -348,11 +348,10 @@ export default function App() {
                       )}
                     </div>
                     
-                    <h1
-                      className="text-5xl sm:text-6xl md:text-8xl mb-4 md:mb-6"
-                      style={{ textShadow: '0 0 40px rgba(139, 92, 246, 0.5), 0 0 70px rgba(59, 130, 246, 0.4)' }}
-                    >
-                      <span className="block">Demo <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Day</span></span>
+                    <h1 className="font-hero-display text-5xl sm:text-6xl md:text-8xl mb-4 md:mb-6 tracking-tight hero-title-glow">
+                      <span className="block">
+                        Demo <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Day</span>
+                      </span>
                       <span className="block mt-2">2026</span>
                     </h1>
                     

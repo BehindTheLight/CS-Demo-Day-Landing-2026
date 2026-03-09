@@ -239,6 +239,23 @@
   animation: faq-glow-pulse 2.5s ease-in-out infinite;
 }
 
+/* Hero title: display font — preferred: Bebas Neue; alternates: Outfit, Sora, Orbitron */
+.font-hero-display {
+  font-family: 'Orbitron', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* Hero title: light static glow (single shadow to avoid lag) */
+.hero-title-glow {
+  text-shadow: 0 0 32px rgba(139, 92, 246, 0.45);
+}
+
+/* Countdown (Days/Hours/Min/Sec): Orbitron font + light purple glow */
+.countdown-glow {
+  text-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
+}
+
 /* Submit & Attend sections: soft breathing glow between blue and purple (stronger for visibility) */
 @keyframes section-cta-glow {
   0%, 100% {
