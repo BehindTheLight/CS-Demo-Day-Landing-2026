@@ -12,7 +12,7 @@ const PARTICIPANT_REGISTRATION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLS
 const PROJECT_SUBMISSION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSevBxky8AILviHbGyK3XLmtiOqw8ddW8tQ0AIy7ZLS1MInYBg/viewform';
 
 const EVENT_DATE = new Date('2026-03-27T10:00:00');
-const EVENT_END_DATE = new Date('2026-03-27T17:00:00'); // 5pm
+const EVENT_END_DATE = new Date('2026-03-27T12:30:00'); // 12:30 PM
 
 // Set to true to test: event "starts" in 5s, "ends" in 20s. Set back to false when done.
 const TEST_COUNTDOWN = false;
@@ -402,7 +402,7 @@ export default function App() {
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-5 h-5 text-purple-400" />
-                        <span>10:00 AM – 1:00 PM</span>
+                        <span>9:30 AM – 12:30 PM</span>
                       </div>
                     </motion.div>
                   </motion.div>
@@ -499,7 +499,7 @@ export default function App() {
               <span className="text-sm uppercase tracking-wider text-purple-400 font-medium">Call for Demos</span>
               <h2 className="text-3xl md:text-5xl mt-3 md:mt-4 mb-4 md:mb-6">Submit Your <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Project</span></h2>
               <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                Applications are open! Fill out the form below to register your project. Deadline: <span className="text-white font-medium">April 30, 2026</span>
+                Applications are open! Fill out the form below to register your project. Deadline: <span className="text-white font-medium">March 20, 2026</span>
               </p>
               
               <div className="space-y-4 mb-8">
@@ -519,7 +519,7 @@ export default function App() {
                   <div className="w-6 h-6 rounded-full bg-blue-500/20 border-2 border-blue-500 flex items-center justify-center mt-1 flex-shrink-0">
                     <div className="w-2 h-2 rounded-full bg-blue-500"></div>
                   </div>
-                  <p className="text-gray-300">Teams of 1–4 members are eligible to participate</p>
+                  <p className="text-gray-300">All students are eligible to participate — individually or as a team.</p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-6 h-6 rounded-full bg-blue-500/20 border-2 border-blue-500 flex items-center justify-center mt-1 flex-shrink-0">
@@ -554,7 +554,7 @@ export default function App() {
                 Register to <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Attend</span>
               </h2>
               <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                Industry professionals, faculty members, and guests are invited to attend CS Demo Day – Winter 2026. Please complete the form below to register your participation. <span className="text-white font-medium">March 27, 2026 · 10:00 AM – 1:00 PM</span>
+                Industry professionals, faculty members, and guests are invited to attend CS Demo Day – Winter 2026. Please complete the form below to register your participation. <span className="text-white font-medium">March 27, 2026 · 9:30 AM – 12:30 PM</span>
               </p>
               <div className="space-y-4 mb-8">
                 <div className="flex items-start gap-3">
@@ -607,15 +607,10 @@ export default function App() {
             variants={scheduleStaggerVariants}
           >
             {[
-              { time: '10:00 AM', tag: 'Setup', tagBlue: true, title: 'Doors Open & Check-In', desc: 'Teams set up their booths and attendees register.' },
-              { time: '10:30 AM', tag: 'Keynote', tagBlue: false, title: 'Opening Ceremony', desc: 'Welcome remarks from the Department Chair and keynote speaker from industry.' },
-              { time: '11:00 AM', tag: 'Demos', tagBlue: true, title: 'Demo Sessions — Round 1', desc: 'First batch of project presentations. Judges and attendees circulate the floor.' },
-              { time: '12:30 PM', tag: 'Break', tagBlue: false, title: 'Lunch Break', desc: 'Catered lunch for all participants and attendees. Networking encouraged!' },
-              { time: '1:30 PM', tag: 'Demos', tagBlue: true, title: 'Demo Sessions — Round 2', desc: 'Second batch of projects presented. Industry guests mingle with teams.' },
-              { time: '3:00 PM', tag: 'Judging', tagBlue: false, title: "Judges' Deliberation", desc: 'Judging panel meets to score and select award winners.' },
-              { time: '3:30 PM', tag: 'Open Floor', tagBlue: true, title: 'Poster Session & Open Floor', desc: 'All projects on display simultaneously — open browsing for all attendees.' },
-              { time: '4:30 PM', tag: 'Awards', tagBlue: false, title: 'Awards Ceremony', desc: 'Announcing winners in all categories, recognition of outstanding projects.' },
-              { time: '5:00 PM', tag: 'Closing', tagBlue: true, title: 'Closing & Networking', desc: 'Event concludes. Informal networking with guests and recruiters.', last: true },
+              { time: '9:30 AM', tag: 'Registration', tagBlue: true, title: 'Registration', desc: 'Check-in and registration for attendees and teams.' },
+              { time: '10:00 AM', tag: 'Opening', tagBlue: false, title: 'Opening Ceremony & Demo Sessions', desc: 'Welcome remarks and beginning of project demos.' },
+              { time: '12:00 PM', tag: 'Awards', tagBlue: false, title: 'Award Ceremony', desc: 'Announcing winners and recognition of outstanding projects.' },
+              { time: '12:30 PM', tag: 'Closing', tagBlue: true, title: 'Closing & Networking', desc: 'Event concludes. Informal networking with guests and recruiters.', last: true },
             ].map((item, i) => (
               <motion.div key={i} className="group flex gap-4 md:gap-6 items-start" variants={scheduleItemVariants}>
                 <div className="flex flex-col items-center shrink-0 -mb-5">
@@ -651,7 +646,7 @@ export default function App() {
               </AccordionTrigger>
               <AccordionContent className="w-full px-4 py-4 md:px-6 md:py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
                 <p className="text-gray-300 leading-relaxed">
-                  Any currently enrolled undergraduate or graduate student in the Computer Science department. Teams of up to 4 members are welcome.
+                  Any currently enrolled undergraduate or graduate student in the Computer Science department. Individuals and teams of any size may participate.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -673,7 +668,51 @@ export default function App() {
               </AccordionTrigger>
               <AccordionContent className="w-full px-4 py-4 md:px-6 md:py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
                 <p className="text-gray-300 leading-relaxed">
-                  Bring your laptop, any hardware needed for your demo, and a printed poster (optional but encouraged). Power outlets will be available at each booth.
+                  Bring all necessary equipment and materials: your laptop, extra monitors, power cords, and any prototypes or visuals. You will need a working demo of your project to showcase at your desk. Power outlets will be available.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-8" className="faq-item-glow w-full border-b-0 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:border-white/20 hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] data-[state=open]:border-purple-500/30">
+              <AccordionTrigger className="w-full text-base md:text-lg hover:no-underline py-5 px-4 md:py-6 md:px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
+                When and where is CS Demo Day?
+              </AccordionTrigger>
+              <AccordionContent className="w-full px-4 py-4 md:px-6 md:py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
+                <p className="text-gray-300 leading-relaxed">
+                  Friday, March 27, 2026, from 9:30 AM to 12:30 PM at the School of Computer Science Advanced Computing Hub, 300 Ouellette Avenue, 4th floor.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-9" className="faq-item-glow w-full border-b-0 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:border-white/20 hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] data-[state=open]:border-purple-500/30">
+              <AccordionTrigger className="w-full text-base md:text-lg hover:no-underline py-5 px-4 md:py-6 md:px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
+                When can I set up my desk?
+              </AccordionTrigger>
+              <AccordionContent className="w-full px-4 py-4 md:px-6 md:py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
+                <p className="text-gray-300 leading-relaxed">
+                  You can set up your desk between 8:00 AM and 9:00 AM. Please ensure you bring all necessary equipment and materials before the event begins at 9:30 AM.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-10" className="faq-item-glow w-full border-b-0 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:border-white/20 hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] data-[state=open]:border-purple-500/30">
+              <AccordionTrigger className="w-full text-base md:text-lg hover:no-underline py-5 px-4 md:py-6 md:px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
+                Will there be a PowerPoint or formal presentation?
+              </AccordionTrigger>
+              <AccordionContent className="w-full px-4 py-4 md:px-6 md:py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
+                <p className="text-gray-300 leading-relaxed">
+                  No. There will be no PowerPoint or formal presentation. You will showcase your project at your desk with a working demo. We encourage you to make your desk as engaging and interactive as possible to attract industry attendees and showcase the unique features of your project.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-11" className="faq-item-glow w-full border-b-0 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:border-white/20 hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] data-[state=open]:border-purple-500/30">
+              <AccordionTrigger className="w-full text-base md:text-lg hover:no-underline py-5 px-4 md:py-6 md:px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
+                How many presenters can be at the desk at once?
+              </AccordionTrigger>
+              <AccordionContent className="w-full px-4 py-4 md:px-6 md:py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
+                <p className="text-gray-300 leading-relaxed">
+                  Please avoid having more than 3 presenters standing near the desk at once. This gives industry attendees and visitors enough space to see your demo.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -713,11 +752,22 @@ export default function App() {
 
             <AccordionItem value="item-7" className="faq-item-glow w-full border-b-0 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:border-white/20 hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] data-[state=open]:border-purple-500/30">
               <AccordionTrigger className="w-full text-base md:text-lg hover:no-underline py-5 px-4 md:py-6 md:px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
-                What prizes are available?
+                What prizes or recognition are available?
               </AccordionTrigger>
               <AccordionContent className="w-full px-4 py-4 md:px-6 md:py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
                 <p className="text-gray-300 leading-relaxed">
-                  Awards include Best Overall Project, Best Technical Achievement, Best Design & UX, Best Social Impact, and People&apos;s Choice. Prize details to be announced.
+                  All presenters will receive a certificate of participation. Winners in categories such as Best Overall Project, Best Technical Achievement, Best Design & UX, Best Social Impact, and People&apos;s Choice will receive winner certificates.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-12" className="faq-item-glow w-full border-b-0 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:border-white/20 hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] data-[state=open]:border-purple-500/30">
+              <AccordionTrigger className="w-full text-base md:text-lg hover:no-underline py-5 px-4 md:py-6 md:px-6 rounded-t-xl bg-white/5 hover:bg-white/[0.08] transition-all duration-300 data-[state=open]:bg-white/[0.08] data-[state=open]:rounded-b-none text-left [&[data-state=open]]:rounded-b-none">
+                What is the dress code?
+              </AccordionTrigger>
+              <AccordionContent className="w-full px-4 py-4 md:px-6 md:py-6 bg-white/[0.03] rounded-b-xl border-t border-white/10">
+                <p className="text-gray-300 leading-relaxed">
+                  Participants are expected to wear formal or semi-formal attire at the event.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -776,7 +826,7 @@ export default function App() {
                 </div>
                 <div className="flex items-start gap-2">
                   <Clock className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
-                  <span>10:00 AM – 1:00 PM</span>
+                  <span>9:30 AM – 12:30 PM</span>
                 </div>
               </div>
             </div>
@@ -787,7 +837,7 @@ export default function App() {
               © 2026 School of Computer Science, University of Windsor. All rights reserved.
             </p>
             <p className="text-gray-400 text-sm">
-              Submission deadline: <span className="text-white">April 30, 2026</span>
+              Submission deadline: <span className="text-white">March 20, 2026</span>
             </p>
           </div>
         </div>
