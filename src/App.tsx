@@ -1,5 +1,6 @@
 import { Calendar, MapPin, Clock, Users, Lightbulb, Trophy, CalendarCheck, ChevronDown, Menu, X } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './components/ui/accordion';
+import { Carousel } from './components/ui/carousel';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'motion/react';
 
@@ -10,6 +11,24 @@ const scheduleItemVariants = { hidden: { opacity: 0, y: 16 }, visible: { opacity
 
 const PARTICIPANT_REGISTRATION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSelqknwzF-ht4gNg1FALEAf7pL-A8gUeTTS9CnCIv5bBvr4nQ/viewform';
 const PROJECT_SUBMISSION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSevBxky8AILviHbGyK3XLmtiOqw8ddW8tQ0AIy7ZLS1MInYBg/viewform';
+
+const CAROUSEL_IMAGES = [
+  {
+    src: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop',
+    alt: 'Students collaborating on a tech project',
+    title: 'Innovation in Action',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=600&fit=crop',
+    alt: 'Computer science students working together',
+    title: 'Teamwork & Collaboration',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop',
+    alt: 'Technology and development showcase',
+    title: 'Cutting Edge Projects',
+  },
+];
 
 const EVENT_DATE = new Date('2026-03-27T10:00:00');
 const EVENT_END_DATE = new Date('2026-03-27T17:00:00'); // 5pm
@@ -486,6 +505,23 @@ export default function App() {
               <h3 className="text-base md:text-lg font-semibold mb-1">Awards & Recognition</h3>
               <p className="text-gray-400 text-sm">Outstanding projects recognized across multiple categories</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery Section */}
+      <section id="gallery" className="py-12 px-4 sm:px-6 md:py-20 md:px-6 relative min-h-screen md:snap-start flex flex-col justify-center">
+        <div className="max-w-7xl mx-auto w-full">
+          <div className="text-center shrink-0 mb-8 md:mb-12">
+            <span className="text-xs md:text-sm uppercase tracking-wider text-purple-400 font-medium">Event Gallery</span>
+            <h2 className="text-3xl md:text-5xl mt-3 md:mt-4 mb-4">
+              <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Highlights</span> From Past Events
+            </h2>
+            <p className="text-gray-400 text-lg">See the innovation and energy from previous Demo Days</p>
+          </div>
+
+          <div className="w-full rounded-2xl overflow-hidden max-h-[500px] md:max-h-[550px]">
+            <Carousel images={CAROUSEL_IMAGES} autoPlay autoPlayInterval={4000} />
           </div>
         </div>
       </section>
