@@ -89,9 +89,10 @@ export default function Team() {
   const goHome = (hash?: string) => {
     setMobileMenuOpen(false);
     if (hash) {
-      navigate(`/${hash}`);
+      const sectionId = hash.startsWith('#') ? hash.slice(1) : hash;
+      navigate('/', { replace: true, state: { targetSection: sectionId } });
     } else {
-      navigate('/');
+      navigate('/', { replace: true });
     }
   };
 

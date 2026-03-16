@@ -127,19 +127,21 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // Support deep links like "/#about" when navigating from other routes (e.g., /team)
+  // Support navigation from other routes (e.g., /team) using location.state.targetSection
   useEffect(() => {
-    if (!location.hash) return;
-    const id = location.hash.replace('#', '');
-    if (!id) return;
+    const state = location.state as { targetSection?: string } | null;
+    if (!state?.targetSection) return;
+    const id = state.targetSection;
     const timeout = setTimeout(() => {
       const el = document.getElementById(id);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
+      // Clear state so a refresh or further navigation doesn't keep re-scrolling
+      navigate(location.pathname, { replace: true, state: null });
     }, 0);
     return () => clearTimeout(timeout);
-  }, [location.hash]);
+  }, [location, navigate]);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -165,6 +167,10 @@ export default function App() {
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
+    if (id === 'hero') {
+      // Clear any hash (e.g., /#gallery) so URL is just the homepage
+      navigate('/', { replace: true });
+    }
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
