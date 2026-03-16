@@ -6,36 +6,43 @@ import { useNavigate } from 'react-router-dom';
 // Load team member images from /public/team-pics/
 const teamImageModules = import.meta.glob<{ default: string }>('/public/team-pics/*.{jpg,jpeg,png}', { eager: true });
 
-const getTeamImagePath = (name: string): string => {
-  // Convert name to possible filename formats
-  // Remove common titles/prefixes first
-  let cleanedName = name.toLowerCase().replace(/^(dr\.|mr\.|mrs\.|ms\.|prof\.|professor)\s+/i, '');
-  const nameParts = cleanedName.split(/\s+/);
-  const firstNameOnly = nameParts[0];
-  const lastNameOnly = nameParts[nameParts.length - 1];
-  const firstAndLast = `${nameParts[0]}-${nameParts[nameParts.length - 1]}`;
-  const firstAndLastUnderscore = `${nameParts[0]}_${nameParts[nameParts.length - 1]}`;
-  
-  const nameFormats = [
-    name.toLowerCase().replace(/\s+/g, '-'),
-    name.toLowerCase().replace(/\s+/g, '_'),
-    name.toLowerCase(),
-    firstAndLast,
-    firstAndLastUnderscore,
-    firstNameOnly,
-    lastNameOnly,
+const normalizeNameForFilename = (name: string) => {
+  const cleaned = name.replace(/^(Dr\.|Mr\.|Mrs\.|Ms\.|Prof\.|Professor)\s+/i, '').trim();
+  return cleaned.toLowerCase();
+};
+
+const getTeamImagePath = (name: string): string | null => {
+  const base = normalizeNameForFilename(name);
+  const parts = base.split(/\s+/);
+  const first = parts[0];
+  const last = parts[parts.length - 1];
+
+  const candidates = [
+    base.replace(/\s+/g, '-'),
+    base.replace(/\s+/g, '_'),
+    base,
+    `${first}-${last}`,
+    `${first}_${last}`,
+    first,
+    last,
   ];
-  
-  for (const format of nameFormats) {
+
+  for (const candidate of candidates) {
     for (const [path, module] of Object.entries(teamImageModules)) {
-      if (path.toLowerCase().includes(format)) {
+      if (path.toLowerCase().includes(candidate)) {
         return module.default;
       }
     }
   }
-  
-  // Fallback to placeholder
-  return `${import.meta.env.BASE_URL}team-placeholder.jpg`;
+
+  return null;
+};
+
+const getInitials = (name: string): string => {
+  const cleaned = name.replace(/^(Dr\.|Mr\.|Mrs\.|Ms\.|Prof\.|Professor)\s+/i, '').trim();
+  const parts = cleaned.split(/\s+/);
+  if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 };
 
 const TEAM_MEMBERS_BASE = [
@@ -226,93 +233,141 @@ export default function Team() {
           </div>
 
           <motion.div
-            className="space-y-8 md:space-y-12"
+            className="space-y-10 md:space-y-14"
             variants={containerVariants}
             initial="hidden"
-            animate={contentInView ? "visible" : "hidden"}
+            animate={contentInView ? 'visible' : 'hidden'}
           >
             {/* Layer 1: Members 1-2 */}
-            <div className="flex flex-wrap justify-center gap-6 md:gap-8">
-              {TEAM_MEMBERS.slice(0, 2).map((member) => (
-                <motion.div
-                  key={member.id}
-                  variants={itemVariants}
-                  className="group relative flex flex-col items-center text-center rounded-xl overflow-hidden border border-white/10 hover:border-purple-500/30 transition-all duration-300 hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] bg-white/[0.03] hover:bg-white/[0.06] p-6 w-full sm:w-auto"
-                >
-                  <div className="w-32 h-32 md:w-40 md:h-40 mb-6 rounded-full overflow-hidden bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center border border-white/10">
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                  </div>
-                  <h3 className="text-lg md:text-xl font-semibold text-white mb-2">{member.name}</h3>
-                  <p className="text-sm md:text-base text-purple-400 font-medium">{member.designation}</p>
-                </motion.div>
-              ))}
+            <div className="space-y-4">
+              <div className="flex flex-wrap justify-center gap-8 md:gap-12">
+                {TEAM_MEMBERS.slice(0, 2).map((member) => (
+                  <motion.div
+                    key={member.id}
+                    variants={itemVariants}
+                    className="group flex flex-col items-center text-center w-56 md:w-64"
+                  >
+                    <div className="w-32 h-32 md:w-40 md:h-40 mb-4 rounded-full overflow-hidden p-[3px] bg-gradient-to-br from-red-500/50 via-rose-500/50 to-orange-400/50 shadow-[0_0_24px_rgba(248,113,113,0.32)] group-hover:shadow-[0_0_32px_rgba(248,113,113,0.5)] transition-all duration-300 flex items-center justify-center team-avatar-pulse-red">
+                      <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0a0f]">
+                        {member.image ? (
+                          <img
+                            src={member.image}
+                            alt={member.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-[#050509]">
+                            <span className="text-xl md:text-2xl font-semibold tracking-wide text-purple-100">
+                              {getInitials(member.name)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <h3 className="text-lg md:text-xl font-semibold text-white mb-1">{member.name}</h3>
+                    <p className="text-sm md:text-base text-purple-200 font-medium">{member.designation}</p>
+                  </motion.div>
+                ))}
+              </div>
             </div>
 
             {/* Layer 2: Members 3-4 */}
-            <div className="flex flex-wrap justify-center gap-6 md:gap-8">
-              {TEAM_MEMBERS.slice(2, 4).map((member) => (
-                <motion.div
-                  key={member.id}
-                  variants={itemVariants}
-                  className="group relative flex flex-col items-center text-center rounded-xl overflow-hidden border border-white/10 hover:border-purple-500/30 transition-all duration-300 hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] bg-white/[0.03] hover:bg-white/[0.06] p-6 w-full sm:w-auto"
-                >
-                  <div className="w-32 h-32 md:w-40 md:h-40 mb-6 rounded-full overflow-hidden bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center border border-white/10">
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                  </div>
-                  <h3 className="text-lg md:text-xl font-semibold text-white mb-2">{member.name}</h3>
-                  <p className="text-sm md:text-base text-purple-400 font-medium">{member.designation}</p>
-                </motion.div>
-              ))}
+            <div className="space-y-4">
+              <div className="flex flex-wrap justify-center gap-8 md:gap-12">
+                {TEAM_MEMBERS.slice(2, 4).map((member) => (
+                  <motion.div
+                    key={member.id}
+                    variants={itemVariants}
+                    className="group flex flex-col items-center text-center w-56 md:w-64"
+                  >
+                    <div className="w-32 h-32 md:w-40 md:h-40 mb-4 rounded-full overflow-hidden p-[3px] bg-gradient-to-br from-purple-500/40 to-blue-500/40 shadow-[0_0_24px_rgba(139,92,246,0.28)] group-hover:shadow-[0_0_32px_rgba(139,92,246,0.42)] transition-all duration-300 flex items-center justify-center team-avatar-pulse-purple">
+                      <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0a0f]">
+                        {member.image ? (
+                          <img
+                            src={member.image}
+                            alt={member.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-[#050509]">
+                            <span className="text-xl md:text-2xl font-semibold tracking-wide text-purple-100">
+                              {getInitials(member.name)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <h3 className="text-lg md:text-xl font-semibold text-white mb-1">{member.name}</h3>
+                    <p className="text-sm md:text-base text-purple-200 font-medium">{member.designation}</p>
+                  </motion.div>
+                ))}
+              </div>
             </div>
 
             {/* Layer 3: Members 5-7 */}
-            <div className="flex flex-wrap justify-center gap-6 md:gap-8">
-              {TEAM_MEMBERS.slice(4, 7).map((member) => (
-                <motion.div
-                  key={member.id}
-                  variants={itemVariants}
-                  className="group relative flex flex-col items-center text-center rounded-xl overflow-hidden border border-white/10 hover:border-purple-500/30 transition-all duration-300 hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] bg-white/[0.03] hover:bg-white/[0.06] p-6 w-full sm:w-auto"
-                >
-                  <div className="w-32 h-32 md:w-40 md:h-40 mb-6 rounded-full overflow-hidden bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center border border-white/10">
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                  </div>
-                  <h3 className="text-lg md:text-xl font-semibold text-white mb-2">{member.name}</h3>
-                  <p className="text-sm md:text-base text-purple-400 font-medium">{member.designation}</p>
-                </motion.div>
-              ))}
+            <div className="space-y-4">
+              <div className="flex flex-wrap justify-center gap-8 md:gap-12">
+                {TEAM_MEMBERS.slice(4, 7).map((member) => (
+                  <motion.div
+                    key={member.id}
+                    variants={itemVariants}
+                    className="group flex flex-col items-center text-center w-56 md:w-64"
+                  >
+                    <div className="w-32 h-32 md:w-40 md:h-40 mb-4 rounded-full overflow-hidden p-[3px] bg-gradient-to-br from-purple-500/40 to-blue-500/40 shadow-[0_0_24px_rgba(139,92,246,0.28)] group-hover:shadow-[0_0_32px_rgba(139,92,246,0.42)] transition-all duration-300 flex items-center justify-center team-avatar-pulse-purple">
+                      <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0a0f]">
+                        {member.image ? (
+                          <img
+                            src={member.image}
+                            alt={member.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-[#050509]">
+                            <span className="text-xl md:text-2xl font-semibold tracking-wide text-purple-100">
+                              {getInitials(member.name)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <h3 className="text-lg md:text-xl font-semibold text-white mb-1">{member.name}</h3>
+                    <p className="text-sm md:text-base text-purple-200 font-medium">{member.designation}</p>
+                  </motion.div>
+                ))}
+              </div>
             </div>
 
             {/* Layer 4: Members 8-10 */}
-            <div className="flex flex-wrap justify-center gap-6 md:gap-8">
-              {TEAM_MEMBERS.slice(7, 10).map((member) => (
-                <motion.div
-                  key={member.id}
-                  variants={itemVariants}
-                  className="group relative flex flex-col items-center text-center rounded-xl overflow-hidden border border-white/10 hover:border-purple-500/30 transition-all duration-300 hover:shadow-[0_0_24px_rgba(139,92,246,0.18)] bg-white/[0.03] hover:bg-white/[0.06] p-6 w-full sm:w-auto"
-                >
-                  <div className="w-32 h-32 md:w-40 md:h-40 mb-6 rounded-full overflow-hidden bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center border border-white/10">
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                  </div>
-                  <h3 className="text-lg md:text-xl font-semibold text-white mb-2">{member.name}</h3>
-                  <p className="text-sm md:text-base text-purple-400 font-medium">{member.designation}</p>
-                </motion.div>
-              ))}
+            <div className="space-y-4">
+              <div className="flex flex-wrap justify-center gap-8 md:gap-12">
+                {TEAM_MEMBERS.slice(7, 10).map((member) => (
+                  <motion.div
+                    key={member.id}
+                    variants={itemVariants}
+                    className="group flex flex-col items-center text-center w-56 md:w-64"
+                  >
+                    <div className="w-32 h-32 md:w-40 md:h-40 mb-4 rounded-full overflow-hidden p-[3px] bg-gradient-to-br from-purple-500/40 to-blue-500/40 shadow-[0_0_24px_rgba(139,92,246,0.28)] group-hover:shadow-[0_0_32px_rgba(139,92,246,0.42)] transition-all duration-300 flex items-center justify-center team-avatar-pulse-purple">
+                      <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0a0f]">
+                        {member.image ? (
+                          <img
+                            src={member.image}
+                            alt={member.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-[#050509]">
+                            <span className="text-xl md:text-2xl font-semibold tracking-wide text-purple-100">
+                              {getInitials(member.name)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <h3 className="text-lg md:text-xl font-semibold text-white mb-1">{member.name}</h3>
+                    <p className="text-sm md:text-base text-purple-200 font-medium">{member.designation}</p>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </motion.div>
         </div>

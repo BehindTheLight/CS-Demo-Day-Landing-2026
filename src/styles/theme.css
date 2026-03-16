@@ -271,3 +271,30 @@
 .section-cta-glow {
   animation: section-cta-glow 4s ease-in-out infinite;
 }
+
+/* Team avatars: subtle continuous pulse around circles */
+@keyframes team-avatar-pulse-purple {
+  0%, 100% {
+    box-shadow: 0 0 24px rgba(139, 92, 246, 0.28);
+  }
+  50% {
+    box-shadow: 0 0 34px rgba(139, 92, 246, 0.42);
+  }
+}
+
+@keyframes team-avatar-pulse-red {
+  0%, 100% {
+    box-shadow: 0 0 24px rgba(248, 113, 113, 0.32);
+  }
+  50% {
+    box-shadow: 0 0 34px rgba(248, 113, 113, 0.5);
+  }
+}
+
+.team-avatar-pulse-purple {
+  animation: team-avatar-pulse-purple 3.2s ease-in-out infinite;
+}
+
+.team-avatar-pulse-red {
+  animation: team-avatar-pulse-red 3.2s ease-in-out infinite;
+}
