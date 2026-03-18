@@ -4,7 +4,7 @@ import { Carousel } from './components/ui/carousel';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'motion/react';
 import { useLocation, useNavigate } from 'react-router-dom';
-
+import {SUBMISSION_DEADLINE_DATE, EVENT_DATE, EVENT_END_DATE, DEMO_DAY_SEASON, DEMO_DAY_YEAR} from './constants/dates';
 const SECTION_IDS = ['hero', 'about', 'gallery', 'submit', 'attend', 'schedule', 'faq', 'meet-the-team'] as const;
 
 const scheduleStaggerVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.065, delayChildren: 0.12 } } };
@@ -64,9 +64,11 @@ const getInitials = (name: string): string => {
   if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
   return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 };
-const SELECTED_PROJECTS_DATE = new Date('2026-03-22T12:00:00'); // Mar 22, 2026 at noon
-const EVENT_DATE = new Date('2026-03-27T10:00:00');
-const EVENT_END_DATE = new Date('2026-03-27T12:30:00'); // 12:30 PM
+//const SUBMISSION_DEADLINE_DATE = new Date('2026-03-19T12:00:00'); // Mar 20, 2026 at noon
+//const EVENT_DATE = new Date('2026-03-27T10:00:00');
+//const EVENT_END_DATE = new Date('2026-03-27T12:30:00'); // 12:30 PM
+//const DEMO_DAY_SEASON = "Winter";
+//const DEMO_DAY_YEAR = 2026;
 
 const TEAM_MEMBERS_BASE = [
   { id: 1, name: 'Dr. Ziad Kobti', designation: 'Director, School of Computer Science' },
@@ -118,6 +120,7 @@ export default function App() {
   const [heroStage, setHeroStage] = useState<1 | 2>(1);
   const [activeSectionIndex, setActiveSectionIndex] = useState(0);
   const [countdown, setCountdown] = useState<CountdownState>(getCountdown);
+  const [showSelectedProjects, setShowSelectedProjects] = useState(() => new Date() >= SUBMISSION_DEADLINE_DATE);
   const scrollContainerRef = useRef<HTMLElement>(null);
   const scheduleRef = useRef<HTMLDivElement>(null);
   const scheduleInView = useInView(scheduleRef, { once: true, amount: 0.05 });
@@ -134,6 +137,17 @@ export default function App() {
     const interval = setInterval(() => setCountdown(getCountdown()), 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Poll once a minute to flip showSelectedProjects when the date passes
+  useEffect(() => {
+    if (showSelectedProjects) return; // already visible, nothing to do
+    const interval = setInterval(() => {
+      if (new Date() >= SUBMISSION_DEADLINE_DATE) {
+        setShowSelectedProjects(true);
+      }
+    }, 60_000);
+    return () => clearInterval(interval);
+  }, [showSelectedProjects]);
 
   // Support navigation from other routes (e.g., /team) using location.state.targetSection
   useEffect(() => {
@@ -190,6 +204,11 @@ export default function App() {
     if (next < SECTION_IDS.length) scrollToSection(SECTION_IDS[next]);
   };
 
+  const navLinkClass = (active: boolean) =>
+    active
+      ? 'pb-0.5 border-b-2 transition-all duration-300 text-white border-white/70 [text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]'
+      : 'pb-0.5 border-b-2 transition-all duration-300 text-gray-400 hover:text-white hover:border-white/50 border-transparent hover:[text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]';
+
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white">
       {/* Navigation */}
@@ -208,83 +227,32 @@ export default function App() {
             </div>
           </button>
           <div className="hidden md:flex items-center gap-8">
-            <button
-              onClick={() => scrollToSection('about')}
-              className={`pb-0.5 border-b-2 transition-all duration-300 ${
-                activeSectionIndex === 1
-                  ? 'text-white border-white/70 [text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]'
-                  : 'text-gray-400 hover:text-white hover:border-white/50 border-transparent hover:[text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]'
-              }`}
-            >
+            <button onClick={() => scrollToSection('about')} className={navLinkClass(activeSectionIndex === 1)}>
               About
             </button>
-            <button
-              onClick={() => scrollToSection('gallery')}
-              className={`pb-0.5 border-b-2 transition-all duration-300 ${
-                activeSectionIndex === 2
-                  ? 'text-white border-white/70 [text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]'
-                  : 'text-gray-400 hover:text-white hover:border-white/50 border-transparent hover:[text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]'
-              }`}
-            >
+            <button onClick={() => scrollToSection('gallery')} className={navLinkClass(activeSectionIndex === 2)}>
               Gallery
             </button>
-            <button
-              onClick={() => scrollToSection('submit')}
-              className={`pb-0.5 border-b-2 transition-all duration-300 ${
-                activeSectionIndex === 3
-                  ? 'text-white border-white/70 [text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]'
-                  : 'text-gray-400 hover:text-white hover:border-white/50 border-transparent hover:[text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]'
-              }`}
-            >
-              Apply
+            <button onClick={() => showSelectedProjects ? navigate('/selected-projects') : scrollToSection('submit')} className={navLinkClass(activeSectionIndex === 3)}>
+              {showSelectedProjects ? 'Selected Projects' : 'Apply'}
             </button>
-            <button
-              onClick={() => scrollToSection('attend')}
-              className={`pb-0.5 border-b-2 transition-all duration-300 ${
-                activeSectionIndex === 4
-                  ? 'text-white border-white/70 [text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]'
-                  : 'text-gray-400 hover:text-white hover:border-white/50 border-transparent hover:[text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]'
-              }`}
-            >
+            <button onClick={() => scrollToSection('attend')} className={navLinkClass(activeSectionIndex === 4)}>
               Attend
             </button>
-            <button
-              onClick={() => scrollToSection('schedule')}
-              className={`pb-0.5 border-b-2 transition-all duration-300 ${
-                activeSectionIndex === 5
-                  ? 'text-white border-white/70 [text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]'
-                  : 'text-gray-400 hover:text-white hover:border-white/50 border-transparent hover:[text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]'
-              }`}
-            >
+            <button onClick={() => scrollToSection('schedule')} className={navLinkClass(activeSectionIndex === 5)}>
               Schedule
             </button>
-            <button
-              onClick={() => navigate('/selected-projects')}
-              className={`pb-0.5 border-b-2 transition-all duration-300 ${
-                false
-                  ? 'text-white border-white/70 [text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]'
-                  : 'text-gray-400 hover:text-white hover:border-white/50 border-transparent hover:[text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]'
-              }`}
-            >
-              Selected Projects
-            </button>
-            <button
-              onClick={() => scrollToSection('faq')}
-              className={`pb-0.5 border-b-2 transition-all duration-300 ${
-                activeSectionIndex === 6
-                  ? 'text-white border-white/70 [text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]'
-                  : 'text-gray-400 hover:text-white hover:border-white/50 border-transparent hover:[text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]'
-              }`}
-            >
+            {/*showSelectedProjects && (
+              <button onClick={() => navigate('/selected-projects')} className={navLinkClass(false)}>
+                Selected Projects
+              </button>
+            )*/}
+            <button onClick={() => scrollToSection('faq')} className={navLinkClass(activeSectionIndex === 6)}>
               FAQ
             </button>
             <button
               onClick={() => scrollToSection('meet-the-team')}
-              className={`pb-0.5 border-b-2 transition-all duration-300 ${
-                activeSectionIndex === SECTION_IDS.indexOf('meet-the-team')
-                  ? 'text-white border-white/70 [text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]'
-                  : 'text-gray-400 hover:text-white hover:border-white/50 border-transparent hover:[text-shadow:0_0_12px_rgba(255,255,255,0.35),0_0_24px_rgba(192,132,252,0.4),0_0_36px_rgba(139,92,246,0.2)]'
-              }`}
+              className={navLinkClass(activeSectionIndex === SECTION_IDS.indexOf('meet-the-team'))}
             >
               Our Team
             </button>
@@ -301,7 +269,7 @@ export default function App() {
         </div>
       </nav>
 
-      {/* Mobile menu overlay */}
+     {/* Mobile menu overlay */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
@@ -324,7 +292,6 @@ export default function App() {
               {[
                 { id: 'about', label: 'About' },
                 { id: 'gallery', label: 'Gallery' },
-                { id: 'submit', label: 'Apply' },
                 { id: 'attend', label: 'Attend' },
                 { id: 'schedule', label: 'Schedule' },
                 { id: 'faq', label: 'FAQ' },
@@ -341,6 +308,25 @@ export default function App() {
                   {label}
                 </button>
               ))}
+              {showSelectedProjects ? (
+                <button
+                  onClick={() => { setMobileMenuOpen(false); navigate('/selected-projects'); }}
+                  className={`text-left py-3 px-4 rounded-xl text-lg font-medium transition-all min-h-[48px] text-gray-400 hover:text-white hover:bg-white/5`}
+                >
+                  Selected Projects
+                </button>
+              ) : (
+                <button
+                  onClick={() => scrollToSection('submit')}
+                  className={`text-left py-3 px-4 rounded-xl text-lg font-medium transition-all min-h-[48px] ${
+                    activeSectionIndex === SECTION_IDS.indexOf('submit')
+                      ? 'text-white bg-white/10'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  Apply
+                </button>
+              )}
               <button
                 onClick={() => scrollToSection('meet-the-team')}
                 className="text-left py-3 px-4 rounded-xl text-lg font-medium transition-all min-h-[48px] text-gray-400 hover:text-white hover:bg-white/5"
@@ -485,7 +471,7 @@ export default function App() {
                       <span className="block">
                         Demo <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Day</span>
                       </span>
-                      <span className="block mt-2">2026</span>
+                      <span className="block mt-2">{DEMO_DAY_YEAR}</span>
                     </h1>
                     
                     <motion.p
@@ -527,7 +513,7 @@ export default function App() {
                     >
                       <div className="flex items-center gap-2">
                         <Calendar className="w-5 h-5 text-purple-400" />
-                        <span>March 27, 2026</span>
+                        <span>{EVENT_DATE.toDateString()}</span>
                       </div>
                       <div className="flex items-start gap-1.5">
                         <MapPin className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
@@ -640,54 +626,81 @@ export default function App() {
         </div>
       </section>
 
-      {/* Call for Submissions */}
+{/* Call for Submissions / Selected Projects (swaps after deadline) */}
       <section id="submit" className="py-12 px-4 sm:px-6 md:py-20 md:px-6 relative min-h-screen md:snap-start flex flex-col justify-center">
         <div className="max-w-4xl mx-auto w-full">
           <div className="section-cta-glow p-6 sm:p-8 md:p-10 rounded-2xl md:rounded-3xl bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-500/10 border relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5"></div>
             <div className="relative z-10">
-              <span className="text-sm uppercase tracking-wider text-purple-400 font-medium">Call for Demos</span>
-              <h2 className="text-3xl md:text-5xl mt-3 md:mt-4 mb-4 md:mb-6">Submit Your <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Project</span></h2>
-              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                Applications are open! Fill out the form below to register your project. Deadline: <span className="text-white font-medium">March 20, 2026</span>
-              </p>
-              
-              <div className="space-y-4 mb-8">
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-blue-500/20 border-2 border-blue-500 flex items-center justify-center mt-1 flex-shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+              {showSelectedProjects ? (
+                <>
+                  <span className="text-sm uppercase tracking-wider text-purple-400 font-medium">Demo Day {DEMO_DAY_SEASON} {DEMO_DAY_YEAR}</span>
+                  <h2 className="text-3xl md:text-5xl mt-3 md:mt-4 mb-4 md:mb-6">
+                    Submissions <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Over!</span>
+                  </h2>
+                  <p className="text-xl text-gray-300 mb-4 leading-relaxed font-medium">
+                    Project Submissions closed!
+                  </p>
+                  <p className="text-lg text-gray-400 mb-4 leading-relaxed">
+                    We have stopped receiving applications for Demo Day {DEMO_DAY_SEASON} {DEMO_DAY_YEAR}. Sorry if you missed the deadline.
+                  </p>
+                  <p className="text-lg text-gray-300 mb-8 leading-relaxed">
+                    The teams whose projects are selected for Demo Day {DEMO_DAY_SEASON} {DEMO_DAY_YEAR} are now available.
+                  </p>
+                  <button
+                    onClick={() => navigate('/selected-projects')}
+                    className="cta-glow-pulse inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all duration-300 text-lg font-medium hover:shadow-[0_0_32px_rgba(139,92,246,0.55),0_0_48px_rgba(59,130,246,0.25)] hover:scale-[1.02]"
+                  >
+                    View Selected Projects
+                    <ChevronDown className="w-5 h-5 rotate-[-90deg]" />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span className="text-sm uppercase tracking-wider text-purple-400 font-medium">Call for Demos</span>
+                  <h2 className="text-3xl md:text-5xl mt-3 md:mt-4 mb-4 md:mb-6">Submit Your <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Project</span></h2>
+                  <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+                    Applications are open! Fill out the form below to register your project. Deadline: <span className="text-white font-medium">{SUBMISSION_DEADLINE_DATE.toDateString()}</span>
+                  </p>
+
+                  <div className="space-y-4 mb-8">
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-500/20 border-2 border-blue-500 flex items-center justify-center mt-1 flex-shrink-0">
+                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                      </div>
+                      <p className="text-gray-300">Must be enrolled as a current CS student (undergraduate or graduate)</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-500/20 border-2 border-blue-500 flex items-center justify-center mt-1 flex-shrink-0">
+                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                      </div>
+                      <p className="text-gray-300">Projects must be original work completed during the academic year</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-500/20 border-2 border-blue-500 flex items-center justify-center mt-1 flex-shrink-0">
+                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                      </div>
+                      <p className="text-gray-300">All students are eligible to participate — individually or as a team.</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-500/20 border-2 border-blue-500 flex items-center justify-center mt-1 flex-shrink-0">
+                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                      </div>
+                      <p className="text-gray-300">A working demo or prototype is required — slides alone are not sufficient</p>
+                    </div>
                   </div>
-                  <p className="text-gray-300">Must be enrolled as a current CS student (undergraduate or graduate)</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-blue-500/20 border-2 border-blue-500 flex items-center justify-center mt-1 flex-shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                  </div>
-                  <p className="text-gray-300">Projects must be original work completed during the academic year</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-blue-500/20 border-2 border-blue-500 flex items-center justify-center mt-1 flex-shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                  </div>
-                  <p className="text-gray-300">All students are eligible to participate — individually or as a team.</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-blue-500/20 border-2 border-blue-500 flex items-center justify-center mt-1 flex-shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                  </div>
-                  <p className="text-gray-300">A working demo or prototype is required — slides alone are not sufficient</p>
-                </div>
-              </div>
-              
-              <a 
-                href={PROJECT_SUBMISSION_URL} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="cta-glow-pulse inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all duration-300 text-lg font-medium hover:shadow-[0_0_32px_rgba(139,92,246,0.55),0_0_48px_rgba(59,130,246,0.25)] hover:scale-[1.02]"
-              >
-                Submit Application
-                <ChevronDown className="w-5 h-5 rotate-[-90deg]" />
-              </a>
+
+                  <a
+                    href={PROJECT_SUBMISSION_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="cta-glow-pulse inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all duration-300 text-lg font-medium hover:shadow-[0_0_32px_rgba(139,92,246,0.55),0_0_48px_rgba(59,130,246,0.25)] hover:scale-[1.02]"
+                  >
+                    Submit Application
+                    <ChevronDown className="w-5 h-5 rotate-[-90deg]" />
+                  </a>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -704,7 +717,7 @@ export default function App() {
                 Register to <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Attend</span>
               </h2>
               <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                Industry professionals, faculty members, and guests are invited to attend CS Demo Day – Winter 2026. Please complete the form below to register your participation. <span className="text-white font-medium">March 27, 2026 · 9:30 AM – 12:30 PM</span>
+                Industry professionals, faculty members, and guests are invited to attend CS Demo Day – {DEMO_DAY_SEASON} {DEMO_DAY_YEAR}. Please complete the form below to register your participation. <span className="text-white font-medium">{EVENT_DATE.toDateString()} · 9:30 AM – 12:30 PM</span>
               </p>
               <div className="space-y-4 mb-8">
                 <div className="flex items-start gap-3">
